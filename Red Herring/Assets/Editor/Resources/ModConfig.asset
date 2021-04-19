@@ -12,9 +12,18 @@ MonoBehaviour:
   m_Name: ModConfig
   m_EditorClassIdentifier: 
   id: RedHerring
-  title: Red Herring
-  author: Me
-  description: 'Red Herring: Noun, something to distract you from the task at hand.'
-  version: 
+  title: Red Herring [REUPLOAD]
+  author: Danny7007
+  description: 'Red Herring: Noun, something to distract you from the task at hand.
+
+
+    Module originally by Deaf
+
+    Reuploaded and reworked by Danny7007
+
+    moduleID: RedHerring
+
+    Manual can be found at ktane.timwi.de'
+  version: 2.0.0
   outputFolder: build
-  previewImage: {fileID: 2800000, guid: e67e0a48baa226b4ebe3eea7232a4b67, type: 3}
+  previewImage: {fileID: 2800000, guid: de2012c518496a340bd66761d39a2865, type: 3}
