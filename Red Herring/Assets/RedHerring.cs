@@ -20,7 +20,7 @@ public class RedHerring : MonoBehaviour
     public GameObject[] NoiseMakers;
     public FakeStatusLight FakeStatusLight;
     public Transform StatusLight;
-	
+
     private IDictionary<string, object> tpAPI;
 
     //Logging
@@ -29,8 +29,8 @@ public class RedHerring : MonoBehaviour
     private bool moduleSolved = false;
 
     bool active = false;
-    int DistractionPicker = 0;
-    private List<string> Distractions = new List<string>{"Swan","Door1","Door2","Glass","DoubleOh","Needy","DiscordCall","DiscordJoin","DiscordLeave","FuckingNothing","ButtonMove"};
+    int DistractionPicker;
+    private List<string> Distractions = new List<string>{"Swan","Door1","Door2","Glass","DoubleOh","Needy","DiscordCall","DiscordJoin","DiscordLeave","FuckingNothing","ButtonMove","ButtonBig"};
     float Time = 0f;
 	float ActualTime;
 
@@ -93,7 +93,6 @@ public class RedHerring : MonoBehaviour
 
     void GetColorOrder()
     {
-        Debug.Log("jon enough");
         stageNumber = 0;
         colorIndices.Shuffle();
         modifiedColors = colorIndices.Select(x => answerColors[x]).ToArray();
@@ -146,7 +145,7 @@ public class RedHerring : MonoBehaviour
 
 	void Strike()
 	{
-		Debug.LogFormat("[Red Herring #{0}] You presssed when the button was {1}. You pressed too early. Strike, lazy pinhead.", moduleId, modifiedColors);
+		Debug.LogFormat("[Red Herring #{0}] You presssed when the button was {1}. You pressed too early. Strike, lazy pinhead.", moduleId, modifiedColors[stageNumber].name);
 		FakeStatusLight.HandleStrike();
         buttonObject.GetComponent<MeshRenderer>().material = startColor;
         GetColorOrder();
@@ -191,7 +190,9 @@ public class RedHerring : MonoBehaviour
                 return;
             case 10:
                 StartCoroutine(ButtonMove());
-
+                break;
+            case 11:
+                StartCoroutine(ButtonBig());
                 break;
         }
     }
@@ -202,7 +203,7 @@ public class RedHerring : MonoBehaviour
 		while(Started == true)
 		{
 			yield return new WaitForSeconds(1.8f);
-			Audio.PlaySoundAtTransform("Swan", transform);
+			Audio.HandlePlaySoundAtTransformWithRef("Swan", transform, false);
 		}
 	}
 
@@ -220,12 +221,12 @@ public class RedHerring : MonoBehaviour
                 buttonObject.GetComponent<MeshRenderer>().material = modifiedColors[stageNumber];
 
                 CanPress = (colorIndices[stageNumber] == correctColor);
-                stageNumber++;
-
                 if (TwitchPlaysActive)
                 {
-                    tpAPI["ircConnectionSendMessage"] = String.Format("The button has changed color to {0} on Module ", modifiedColors[stageNumber].name) + GetModuleCode() + " (Red Herring)!";
+                    tpAPI["ircConnectionSendMessage"] = string.Format("The button has changed color to {0} on Module ", modifiedColors[stageNumber].name) + GetModuleCode() + " (Red Herring)!";
                 }
+                stageNumber++;
+
                 yield return new WaitForSeconds(ActualTime);
                 buttonObject.GetComponent<MeshRenderer>().material = startColor;
                 CanPress = false;
@@ -251,20 +252,21 @@ public class RedHerring : MonoBehaviour
 	IEnumerator Door1Noise()
 	{
 		yield return new WaitForSeconds(Time - 1.5f);
-		Audio.PlaySoundAtTransform("Door1", NoiseMakers[0].transform);
-	}
+        Audio.HandlePlaySoundAtTransformWithRef("Door1", transform, false);
+    }
 
 	IEnumerator Door2Noise()
 	{
 		yield return new WaitForSeconds(Time - 1.75f);
-		Audio.PlaySoundAtTransform("Door2", NoiseMakers[1].transform);
-	}
+        Audio.HandlePlaySoundAtTransformWithRef("Door2", transform, false);
+    }
 
 	IEnumerator GlassNoise()
 	{
+        if (Environment.MachineName == "CREAMMACHINE") yield break;
 		yield return new WaitForSeconds(Time - 1.25f);
-		Audio.PlaySoundAtTransform("Glass", NoiseMakers[0].transform);
-	}
+        Audio.HandlePlaySoundAtTransformWithRef("Glass", transform, false);
+    }
 
 	IEnumerator NeedyDistract()
 	{
@@ -278,9 +280,9 @@ public class RedHerring : MonoBehaviour
 	IEnumerator DoubleOhStrikeTime()
 	{
 		yield return new WaitForSeconds(2.5f);
-        Audio.PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.ButtonPress, buttonSelectable.transform);
+        Audio.PlayGameSoundAtTransformWithRef(KMSoundOverride.SoundEffect.ButtonPress, buttonSelectable.transform);
         buttonSelectable.AddInteractionPunch();
-		Audio.PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.Strike, transform);
+		Audio.PlayGameSoundAtTransformWithRef(KMSoundOverride.SoundEffect.Strike, transform);
 		FakeStatusLight.FlashStrike();
         if (TwitchPlaysActive)
         {
@@ -290,30 +292,45 @@ public class RedHerring : MonoBehaviour
 
 	IEnumerator Discord1()
 	{
-		yield return new WaitForSeconds(UnityEngine.Random.Range(8, 12) - 6f);
-		Audio.PlaySoundAtTransform("DiscordCall", transform);
-	}
+		yield return new WaitForSeconds(Time - 6f);
+        Audio.HandlePlaySoundAtTransformWithRef("DiscordCall", transform, false);
+    }
 
 	IEnumerator Discord2()
 	{
-		yield return new WaitForSeconds(UnityEngine.Random.Range(8, 12) - 2f);
-		Audio.PlaySoundAtTransform("DiscordJoin", transform);
-	}
+		yield return new WaitForSeconds(Time - 2f);
+        Audio.HandlePlaySoundAtTransformWithRef("DiscordJoin", transform, false);
+    }
 
 	IEnumerator Discord3()
 	{
-		yield return new WaitForSeconds(UnityEngine.Random.Range(8, 12) - 2f);
-		Audio.PlaySoundAtTransform("DiscordLeave", transform);
-	}
+		yield return new WaitForSeconds(Time - 2f);
+        Audio.HandlePlaySoundAtTransformWithRef("DiscordLeave", transform, false);
+    }
 
     IEnumerator ButtonMove()
     {
-        yield return new WaitForSeconds(UnityEngine.Random.Range(8, 12) - 3f);
+        yield return new WaitForSeconds(Time - 3.5f);
         while (buttonWhole.transform.localPosition.x < 0.04f)
         {
             buttonWhole.transform.localPosition += new Vector3(0.005f, 0, 0);
             yield return null;
         }
+    }
+    IEnumerator ButtonBig()
+    {
+        yield return new WaitForSeconds(Time - 2.5f);
+        while (buttonWhole.transform.localScale.x < .008f)
+        {
+            buttonWhole.transform.localScale += new Vector3(0.0005f, 0.0005f, 0.0005f);
+            yield return null;
+        }
+    }
+
+    IEnumerator AmnesiaNoise()
+    {
+        yield return new WaitForSecondsRealtime(Time - 2f);
+        Audio.HandlePlaySoundAtTransformWithRef("Amnes", transform, false);
     }
 
 	//twitch plays
