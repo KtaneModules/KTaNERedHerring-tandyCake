@@ -44,11 +44,11 @@ public class RedHerring : MonoBehaviour
     private Material[] modifiedColors;
     int stageNumber;
     int[][] table = new int[][]
-    {
-        new int[] { 3, 2, 0, 1},
-        new int[] { 1, 0, 2, 3},
-        new int[] { 2, 3, 1, 0},
-        new int[] { 0, 1, 3, 2},
+    {            // G  B  P  O
+        new int[] { 0, 2, 3, 1},
+        new int[] { 2, 0, 1, 3},
+        new int[] { 1, 3, 2, 0},
+        new int[] { 3, 1, 0, 2},
     };
     int correctColor;
     int randomChance;
@@ -121,6 +121,8 @@ public class RedHerring : MonoBehaviour
 	{
 		buttonSelectable.AddInteractionPunch();
 		GetComponent<KMAudio>().PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.ButtonPress, buttonSelectable.transform);
+        if (moduleSolved)
+            return;
 		if (TogglePress == false)
 		{
 			Debug.LogFormat("[Red Herring #{0}] You have started the timer.", moduleId);
@@ -213,6 +215,8 @@ public class RedHerring : MonoBehaviour
         {
             for (int i = 0; i < 4; i++)
             {
+                if (moduleSolved)
+                    yield break;
                 Started = true;
                 Time = UnityEngine.Random.Range(4f, 6f);
                 if (colorIndices[(stageNumber + randomChance) % 4] == correctColor)
