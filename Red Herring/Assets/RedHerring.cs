@@ -93,7 +93,6 @@ public class RedHerring : MonoBehaviour
 
     void GetColorOrder()
     {
-        stageNumber = 0;
         colorIndices.Shuffle();
         modifiedColors = colorIndices.Select(x => answerColors[x]).ToArray();
         Debug.LogFormat("[Red Herring #{0}] The color order forseen by the module is {1}.", moduleId, modifiedColors.Select(x => x.name).Join());
@@ -132,7 +131,7 @@ public class RedHerring : MonoBehaviour
 
 		else
 		{
-			if (CanPress == true)
+			if (CanPress)
 			{
 				FakeStatusLight.HandlePass(StatusLightState.Green);
                 buttonObject.GetComponent<MeshRenderer>().material = startColor;
@@ -147,8 +146,9 @@ public class RedHerring : MonoBehaviour
 
 	void Strike()
 	{
-		Debug.LogFormat("[Red Herring #{0}] You presssed when the button was {1}. You pressed too early. Strike, lazy pinhead.", moduleId, modifiedColors[stageNumber].name);
+		Debug.LogFormat("[Red Herring #{0}] You presssed when the button was {1}. You pressed too early. Strike.", moduleId, modifiedColors[stageNumber].name);
 		FakeStatusLight.HandleStrike();
+        stageNumber = 0;
         buttonObject.GetComponent<MeshRenderer>().material = startColor;
         GetColorOrder();
 		TogglePress = false;
@@ -245,7 +245,7 @@ public class RedHerring : MonoBehaviour
 			else
 			{
 			  TogglePress = false;
-			  Debug.LogFormat("[Red Herring #{0}] You didn't press in time. Strike, slow poke.", moduleId);
+			  Debug.LogFormat("[Red Herring #{0}] You didn't press in time. Strike.", moduleId);
 			  GetComponent<KMBombModule>().HandleStrike();
                 GetColorOrder();
 			  yield return null;
@@ -290,7 +290,7 @@ public class RedHerring : MonoBehaviour
 		FakeStatusLight.FlashStrike();
         if (TwitchPlaysActive)
         {
-            tpAPI["ircConnectionSendMessage"] = "VoteNay Module "+GetModuleCode()+" (Red Herring) got a strike! -6 points from MrPeanut1028 VoteNay!";
+            tpAPI["ircConnectionSendMessage"] = string.Format("VoteNay Module {0} (Red Herring) got a strike! -6 points from MrPeanut1028 VoteNay!", GetModuleCode());
         }
 	}
 
@@ -344,7 +344,7 @@ public class RedHerring : MonoBehaviour
 
 	IEnumerator ProcessTwitchCommand(string command)
 	{
-		if (Regex.IsMatch(command, @"^\s*(push)|(press)\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant) || Regex.IsMatch(command, @"^\s*press\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))
+		if (Regex.IsMatch(command, @"^\s*(push)|(press)\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))
         {
 			yield return null;
 			buttonSelectable.OnInteract();
