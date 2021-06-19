@@ -11,6 +11,7 @@ public class RedHerring : MonoBehaviour
 {
     public KMBombInfo Bomb;
     public KMAudio Audio;
+    public KMColorblindMode Colorblind;
     public KMSelectable buttonSelectable;
     public GameObject buttonObject;
     public GameObject buttonWhole;
@@ -20,6 +21,9 @@ public class RedHerring : MonoBehaviour
     public GameObject[] NoiseMakers;
     public FakeStatusLight FakeStatusLight;
     public Transform StatusLight;
+    public GameObject modBG;
+    public TextMesh cbText;
+    private bool cbON;
 
     private IDictionary<string, object> tpAPI;
 
@@ -30,7 +34,7 @@ public class RedHerring : MonoBehaviour
 
     bool active = false;
     int DistractionPicker;
-    private List<string> Distractions = new List<string>{"Swan","Door1","Door2","Glass","DoubleOh","Needy","DiscordCall","DiscordJoin","DiscordLeave","FuckingNothing","ButtonMove","ButtonBig"};
+    private List<string> Distractions = new List<string>{"Swan","Door1","Door2","Glass","DoubleOh","Needy","DiscordCall","DiscordJoin","DiscordLeave","FuckingNothing","ButtonMove","ButtonBig","BGDisappear"};
     float Time = 0f;
 	float ActualTime;
 
@@ -66,7 +70,10 @@ public class RedHerring : MonoBehaviour
 
     void Start()
 	{
+        if (Colorblind.ColorblindModeActive)
+            ToggleCB();
         DistractionPicker = UnityEngine.Random.Range(0,Distractions.Count());
+        //DistractionPicker = Distractions.Count - 1; //Debug line  
         FakeStatusLight = Instantiate(FakeStatusLight);
         FakeStatusLight.transform.SetParent(transform, false);
         if (GetComponent<KMBombModule>() != null)
@@ -135,6 +142,7 @@ public class RedHerring : MonoBehaviour
 			{
 				FakeStatusLight.HandlePass(StatusLightState.Green);
                 buttonObject.GetComponent<MeshRenderer>().material = startColor;
+                cbText.text = string.Empty;
 				moduleSolved = true;
 			}
 			else
@@ -144,12 +152,19 @@ public class RedHerring : MonoBehaviour
 		}
 	}
 
+    void ToggleCB()
+    {
+        cbON = !cbON;
+        cbText.gameObject.SetActive(cbON);
+    }
+
 	void Strike()
 	{
 		Debug.LogFormat("[Red Herring #{0}] You presssed when the button was {1}. You pressed too early. Strike.", moduleId, modifiedColors[stageNumber].name);
 		FakeStatusLight.HandleStrike();
         stageNumber = 0;
         buttonObject.GetComponent<MeshRenderer>().material = startColor;
+        cbText.text = string.Empty;
         GetColorOrder();
 		TogglePress = false;
 		DistractionPicker = UnityEngine.Random.Range(0,Distractions.Count());
@@ -196,6 +211,9 @@ public class RedHerring : MonoBehaviour
             case 11:
                 StartCoroutine(ButtonBig());
                 break;
+            case 12:
+                StartCoroutine(Disappear());
+                break;
         }
     }
 	
@@ -223,6 +241,7 @@ public class RedHerring : MonoBehaviour
                     PlayDistraction();
                 yield return new WaitForSeconds(Time);
                 buttonObject.GetComponent<MeshRenderer>().material = modifiedColors[stageNumber];
+                cbText.text = modifiedColors[stageNumber].name.Substring(0, 1);
 
                 CanPress = (colorIndices[stageNumber] == correctColor);
                 if (TwitchPlaysActive)
@@ -233,6 +252,7 @@ public class RedHerring : MonoBehaviour
 
                 yield return new WaitForSeconds(ActualTime);
                 buttonObject.GetComponent<MeshRenderer>().material = startColor;
+                cbText.text = string.Empty;
                 CanPress = false;
             }
 			Started = false;
@@ -317,16 +337,16 @@ public class RedHerring : MonoBehaviour
         yield return new WaitForSeconds(Time - 3.5f);
         while (buttonWhole.transform.localPosition.x < 0.04f)
         {
-            buttonWhole.transform.localPosition += new Vector3(0.005f, 0, 0);
+            buttonWhole.transform.localPosition += 0.005f * Vector3.right;
             yield return null;
         }
     }
     IEnumerator ButtonBig()
     {
-        yield return new WaitForSeconds(Time - 2.5f);
+        yield return new WaitForSeconds(Time - 1f);
         while (buttonWhole.transform.localScale.x < .008f)
         {
-            buttonWhole.transform.localScale += new Vector3(0.0005f, 0.0005f, 0.0005f);
+            buttonWhole.transform.localScale += 0.0005f * Vector3.one;
             yield return null;
         }
     }
@@ -335,6 +355,12 @@ public class RedHerring : MonoBehaviour
     {
         yield return new WaitForSecondsRealtime(Time - 2f);
         Audio.HandlePlaySoundAtTransformWithRef("Amnes", transform, false);
+    }
+
+    IEnumerator Disappear()
+    {
+        yield return new WaitForSecondsRealtime(Time - 1f);
+        modBG.gameObject.gameObject.gameObject.gameObject.gameObject.gameObject.gameObject.gameObject.gameObject.gameObject.gameObject.gameObject.gameObject.gameObject.gameObject.SetActive(2 + 2 == 5);
     }
 
 	//twitch plays
