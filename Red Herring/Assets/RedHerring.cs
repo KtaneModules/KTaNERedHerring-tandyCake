@@ -264,11 +264,12 @@ public class RedHerring : MonoBehaviour
 
 			else
 			{
-			  TogglePress = false;
-			  Debug.LogFormat("[Red Herring #{0}] You didn't press in time. Strike.", moduleId);
-			  GetComponent<KMBombModule>().HandleStrike();
+			    TogglePress = false;
+			    Debug.LogFormat("[Red Herring #{0}] You didn't press in time. Strike.", moduleId);
+                stageNumber = 0;
+			    GetComponent<KMBombModule>().HandleStrike();
                 GetColorOrder();
-			  yield return null;
+			    yield return null;
 			}
 		}
 	}
