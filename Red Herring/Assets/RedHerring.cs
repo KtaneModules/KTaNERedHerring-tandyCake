@@ -32,15 +32,12 @@ public class RedHerring : MonoBehaviour
     int moduleId;
     private bool moduleSolved = false;
 
-    bool active = false;
     int DistractionPicker;
     private List<string> Distractions = new List<string>{"Swan","Door1","Door2","Glass","DoubleOh","Needy","DiscordCall","DiscordJoin","DiscordLeave","FuckingNothing","ButtonMove","ButtonBig","BGDisappear"};
     float Time = 0f;
 	float ActualTime;
 
-    bool WindowofPress = false;
     bool Started = false;
-    bool Pressed = false;
     bool TogglePress = false;
     bool CanPress = false;
 
@@ -220,16 +217,16 @@ public class RedHerring : MonoBehaviour
 	IEnumerator Swan()
 	{
 		yield return new WaitForSeconds(1.2f);
-		while(Started == true)
+		while(Started)
 		{
 			yield return new WaitForSeconds(1.8f);
-			Audio.HandlePlaySoundAtTransformWithRef("Swan", transform, false);
+			Audio.HandlePlaySoundAtTransform("Swan", transform);
 		}
 	}
 
 	IEnumerator StartThing()
 	{
-        while (TogglePress == true)
+        while (TogglePress)
         {
             for (int i = 0; i < 4; i++)
             {
@@ -277,20 +274,20 @@ public class RedHerring : MonoBehaviour
 	IEnumerator Door1Noise()
 	{
 		yield return new WaitForSeconds(Time - 1.5f);
-        Audio.HandlePlaySoundAtTransformWithRef("Door1", transform, false);
+        Audio.HandlePlaySoundAtTransform("Door1", transform);
     }
 
 	IEnumerator Door2Noise()
 	{
 		yield return new WaitForSeconds(Time - 1.75f);
-        Audio.HandlePlaySoundAtTransformWithRef("Door2", transform, false);
+        Audio.HandlePlaySoundAtTransform("Door2", transform);
     }
 
 	IEnumerator GlassNoise()
 	{
         if (Environment.MachineName == "CREAMMACHINE") yield break;
 		yield return new WaitForSeconds(Time - 1.25f);
-        Audio.HandlePlaySoundAtTransformWithRef("Glass", transform, false);
+        Audio.HandlePlaySoundAtTransform("Glass", transform);
     }
 
 	IEnumerator NeedyDistract()
@@ -305,32 +302,32 @@ public class RedHerring : MonoBehaviour
 	IEnumerator DoubleOhStrikeTime()
 	{
 		yield return new WaitForSeconds(2.5f);
-        Audio.PlayGameSoundAtTransformWithRef(KMSoundOverride.SoundEffect.ButtonPress, buttonSelectable.transform);
+        Audio.PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.ButtonPress, buttonSelectable.transform);
         buttonSelectable.AddInteractionPunch();
-		Audio.PlayGameSoundAtTransformWithRef(KMSoundOverride.SoundEffect.Strike, transform);
+		Audio.PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.Strike, transform);
 		FakeStatusLight.FlashStrike();
         if (TwitchPlaysActive)
         {
-            tpAPI["ircConnectionSendMessage"] = string.Format("VoteNay Module {0} (Red Herring) got a strike! -6 points from MrPeanut1028 VoteNay!", GetModuleCode());
+            tpAPI["ircConnectionSendMessage"] = string.Format("VoteNay Module {0} (Red Herring) got a strike! -6 points from Marksam32 VoteNay!", GetModuleCode());
         }
 	}
 
 	IEnumerator Discord1()
 	{
 		yield return new WaitForSeconds(Time - 6f);
-        Audio.HandlePlaySoundAtTransformWithRef("DiscordCall", transform, false);
+        Audio.HandlePlaySoundAtTransform("DiscordCall", transform);
     }
 
 	IEnumerator Discord2()
 	{
 		yield return new WaitForSeconds(Time - 2f);
-        Audio.HandlePlaySoundAtTransformWithRef("DiscordJoin", transform, false);
+        Audio.HandlePlaySoundAtTransform("DiscordJoin", transform);
     }
 
 	IEnumerator Discord3()
 	{
 		yield return new WaitForSeconds(Time - 2f);
-        Audio.HandlePlaySoundAtTransformWithRef("DiscordLeave", transform, false);
+        Audio.HandlePlaySoundAtTransform("DiscordLeave", transform);
     }
 
     IEnumerator ButtonMove()
@@ -355,7 +352,7 @@ public class RedHerring : MonoBehaviour
     IEnumerator AmnesiaNoise()
     {
         yield return new WaitForSecondsRealtime(Time - 2f);
-        Audio.HandlePlaySoundAtTransformWithRef("Amnes", transform, false);
+        Audio.HandlePlaySoundAtTransform("Amnes", transform);
     }
 
     IEnumerator Disappear()
