@@ -157,7 +157,7 @@ public class RedHerring : MonoBehaviour
 
 	void Strike()
 	{
-		Debug.LogFormat("[Red Herring #{0}] You presssed when the button was {1}. You pressed too early. Strike.", moduleId, modifiedColors[stageNumber].name);
+		Debug.LogFormat("[Red Herring #{0}] You presssed when the button was {1}. You pressed too early. Strike.", moduleId, buttonObject.GetComponent<MeshRenderer>().material.name.TakeWhile(x => !Char.IsWhiteSpace(x)).Join(""));
 		FakeStatusLight.HandleStrike();
         stageNumber = 0;
         buttonObject.GetComponent<MeshRenderer>().material = startColor;
@@ -351,13 +351,13 @@ public class RedHerring : MonoBehaviour
 
     IEnumerator AmnesiaNoise()
     {
-        yield return new WaitForSecondsRealtime(Time - 2f);
+        yield return new WaitForSeconds(Time - 2f);
         Audio.HandlePlaySoundAtTransform("Amnes", transform);
     }
 
     IEnumerator Disappear()
     {
-        yield return new WaitForSecondsRealtime(Time - 1f);
+        yield return new WaitForSeconds(Time - 1f);
         modBG.gameObject.gameObject.gameObject.gameObject.gameObject.gameObject.gameObject.gameObject.gameObject.gameObject.gameObject.gameObject.gameObject.gameObject.gameObject.SetActive(2 + 2 == 5);
     }
 
@@ -378,14 +378,11 @@ public class RedHerring : MonoBehaviour
 
     IEnumerator TwitchHandleForcedSolve()
     {
+        TwitchPlaysActive = false;
         if (!TogglePress)
-        {
             buttonSelectable.OnInteract();
-        }
         while (!CanPress)
-        {
             yield return new WaitForSeconds(0.1f);
-        }
         buttonSelectable.OnInteract();
     }
 
