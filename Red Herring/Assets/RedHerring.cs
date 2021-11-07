@@ -157,7 +157,9 @@ public class RedHerring : MonoBehaviour
 
 	void Strike()
 	{
-		Debug.LogFormat("[Red Herring #{0}] You presssed when the button was {1}. You pressed too early. Strike.", moduleId, buttonObject.GetComponent<MeshRenderer>().material.name.TakeWhile(x => !Char.IsWhiteSpace(x)).Join(""));
+		Debug.LogFormat("[Red Herring #{0}] You presssed when the button was {1}. You pressed too {2}. Strike.", 
+            moduleId, buttonObject.GetComponent<MeshRenderer>().material.name.TakeWhile(x => !Char.IsWhiteSpace(x)).Join(""), 
+            Array.IndexOf(colorIndices, correctColor) > stageNumber ? "early" : "late");
 		FakeStatusLight.HandleStrike();
         stageNumber = 0;
         buttonObject.GetComponent<MeshRenderer>().material = startColor;
