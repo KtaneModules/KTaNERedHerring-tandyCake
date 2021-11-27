@@ -143,9 +143,8 @@ public class RedHerring : MonoBehaviour
 				moduleSolved = true;
 			}
 			else
-			{
 				Strike();
-			}
+            Started = false;
 		}
 	}
 
